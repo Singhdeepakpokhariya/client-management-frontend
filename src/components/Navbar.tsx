@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   return (
     <nav className="bg-white shadow-sm fixed top-0 inset-x-0 z-30">
       <div className="container mx-auto ">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 mx-5">
           <div className="flex items-center">
             <button
               type="button"

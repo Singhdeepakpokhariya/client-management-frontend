@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useCallback, useEffect, useRef, useState} from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, UserCircle, LogOut, BarChart2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +10,26 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Handle clicks outside the dropdown
+  const handleClickOutside = useCallback((e: MouseEvent) => {
+    if (!dropdownRef.current?.contains(e.target as Node)) {
+      setDropdownOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    // Clean up on unmount
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen, handleClickOutside]);
   
   return (
     <nav className="bg-white shadow-sm fixed top-0 inset-x-0 z-30">
@@ -32,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
             </Link>
           </div>
           
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none"

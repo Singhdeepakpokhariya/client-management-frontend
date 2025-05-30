@@ -3,6 +3,7 @@ import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { UserPlus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { AxiosError } from 'axios';
 
 interface RegisterFormData {
   name: string;
@@ -27,8 +28,9 @@ const Register: React.FC = () => {
       setApiError(null);
       await registerUser(data.email, data.password, data.name);
       navigate('/dashboard');
-    } catch (err: any) {
-      setApiError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message: string }>;
+      setApiError(error.response?.data?.message || 'Registration failed. Please try again.');
     }
   };
 

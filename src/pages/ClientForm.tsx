@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Save, ArrowLeft, Trash2, AlertTriangle } from 'lucide-react';
 
 import { getClient, createClient, updateClient, deleteClient } from '../api/clients';
@@ -39,7 +39,6 @@ const ClientForm: React.FC = () => {
   const { 
     register, 
     handleSubmit, 
-    control, 
     reset, 
     formState: { errors, isDirty, isSubmitting }
   } = useForm<ClientFormData>();

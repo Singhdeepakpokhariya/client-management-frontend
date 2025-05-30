@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import axios, { AxiosError } from 'axios';
 import { API_URL } from '../config';
-
+import { useQueryClient } from '@tanstack/react-query';
 interface User {
   id: string;
   email: string;
@@ -39,6 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   
   // Check if user is already logged in
   useEffect(() => {
@@ -81,8 +81,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+       // 💥 Invalidate old cached data after user is set
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+    } catch (err: unknown) {
+        const error = err as AxiosError<{ message: string }>;
+      setError(error.response?.data?.message || 'Login failed. Please try again.');
       throw err;
     } finally {
       setIsLoading(false);
@@ -100,8 +103,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message: string }>;
+      setError(error.response?.data?.message || 'Registration failed. Please try again.');
       throw err;
     } finally {
       setIsLoading(false);
@@ -112,6 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
+    queryClient.clear(); // Clears everything: safest
   };
   
   const value = {

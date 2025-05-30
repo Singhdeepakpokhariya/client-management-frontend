@@ -3,6 +3,7 @@ import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { UserCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { AxiosError } from 'axios';
 
 interface LoginFormData {
   email: string;
@@ -25,8 +26,9 @@ const Login: React.FC = () => {
       setApiError(null);
       await login(data.email, data.password);
       navigate('/dashboard');
-    } catch (err: any) {
-      setApiError(err.response?.data?.message || 'Login failed. Please try again.');
+    } catch (err: unknown) {
+        const error = err as AxiosError<{ message: string }>;
+      setApiError(error.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 

@@ -5,12 +5,16 @@ import { Plus, Search, RefreshCw, AlertCircle,Bell } from 'lucide-react';
 import { fetchClients, triggerSmsReminders } from '../api/clients';
 import ClientCard from '../components/ClientCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard: React.FC = () => {
+ 
+ const {user} = useAuth();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['clients'],
+    queryKey: ['clients',user?.id],
     queryFn: fetchClients
   });
 
@@ -26,7 +30,7 @@ const Dashboard: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['smsRemainder'] });
     },
   });
-
+  console.log("user",user);
 
   return (
     <div className="container mx-auto px-4 py-6">
